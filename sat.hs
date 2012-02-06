@@ -29,12 +29,12 @@ empty l
 
 dpll :: SolverState -> Result
 dpll s = let s1 = unitpropagate s
-             f  = formula s
-             r  = record s
+             f  = formula s1
+             r  = record s1
          in if empty f then Result True r
             else let l  = chooseLiteral f
                      rl = l:r
-                     res= dpll $ SolverState (simplify f l) rl
+                     res= dpll (SolverState (simplify f l) rl)
                  in if sat res then res
                     else let n = l * (-1)
                          in dpll $ SolverState (simplify f n) (n:r)
@@ -67,11 +67,11 @@ clauseSat c l = if empty c then False
                         else clauseSat (tail c) l
 
 simpClause :: Clause -> Literal -> Clause
-simpClause c l = let sc c1 l1 d = if empty c then d
-                                  else let m = head c
-                                           r = tail c
-                                       in if (l `div` m) == -1 then sc r l d
-                                          else sc r l (m:d)
+simpClause c l = let sc c l d = if empty c then d
+                                else let m = head c
+                                         r = tail c
+                                     in if (-1) == (l `div` m) then sc r l d
+                                        else sc r l (m:d)
                  in sc c l []
 
 containsEmpty :: Formula -> Bool
