@@ -70,7 +70,7 @@ simpClause :: Clause -> Literal -> Clause
 simpClause c l = let sc c l d = if empty c then d
                                 else let m = head c
                                          r = tail c
-                                     in if (-1) == (l `div` m) then sc r l d
+                                     in if l == (m * (-1)) then sc r l d
                                         else sc r l (m:d)
                  in sc c l []
 
