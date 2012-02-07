@@ -78,3 +78,7 @@ unit [] = False
 unit f = let c = head f
              r = tail f
          in if (length c) == 1 then True else unit r
+
+solve :: [[Integer]] -> (Bool,[Integer])
+solve f = let result = dpll (SolverState f [])
+          in (sat result, answer result)
