@@ -24,11 +24,6 @@ dpll s = let s1 = unitpropagate s
                          else let n = l * (-1)
                               in dpll $ SolverState (simplify f n) (n:r)
 
-
-
-
-
-
 empty :: [a] -> Bool
 empty l
     | length l == 0 = True
