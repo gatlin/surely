@@ -1,14 +1,3 @@
-{-
- - sat
- - a pure-functional SAT solver written in Haskell
- -
- - it should be noted that this code was originally written in
- - Typed Racket so it looks a lot like Scheme. I don't know that
- - this is a bad thing.
- -}
-
--- define our types
-
 type Literal = Integer
 type Clause = [Literal]
 type Formula = [Clause]
@@ -22,22 +11,28 @@ data Result = Result { sat :: Bool
                      , answer :: Record
                      } deriving (Show)
 
-empty :: [a] -> Bool
-empty l
-    | length l == 0 = True
-    | otherwise     = False
-
 dpll :: SolverState -> Result
 dpll s = let s1 = unitpropagate s
              f  = formula s1
              r  = record s1
          in if empty f then Result True r
-            else let l  = chooseLiteral f
-                     rl = l:r
-                     res= dpll (SolverState (simplify f l) rl)
-                 in if sat res then res
-                    else let n = l * (-1)
-                         in dpll $ SolverState (simplify f n) (n:r)
+            else if containsEmpty f then Result False []
+                 else let l  = chooseLiteral f
+                          rl = l:r
+                          res= dpll (SolverState (simplify f l) rl)
+                      in if sat res then res
+                         else let n = l * (-1)
+                              in dpll $ SolverState (simplify f n) (n:r)
+
+
+
+
+
+
+empty :: [a] -> Bool
+empty l
+    | length l == 0 = True
+    | otherwise     = False
 
 unitpropagate :: SolverState -> SolverState
 unitpropagate s = let prop f r = if (empty f) || (containsEmpty f) || not (unit f)
