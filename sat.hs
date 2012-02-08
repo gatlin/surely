@@ -12,62 +12,59 @@ data Result = Result { sat :: Bool
                      } deriving (Show)
 
 dpll :: SolverState -> Result
-dpll s = let s1 = unitpropagate s
-             f  = formula s1
-             r  = record s1
-         in if empty f then Result True r
-            else if containsEmpty f then Result False []
-                 else let l  = chooseLiteral f
-                          rl = l:r
-                          res= dpll (SolverState (simplify f l) rl)
-                      in if sat res then res
-                         else let n = l * (-1)
-                              in dpll $ SolverState (simplify f n) (n:r)
-
-empty :: [a] -> Bool
-empty l
-    | length l == 0 = True
-    | otherwise     = False
+dpll (SolverState [] r) = Result True r
+dpll s
+    | containsEmpty f = Result False []
+    | sat res = res
+    | otherwise = dpll $ SolverState (simplify f n) (n:r)
+    where
+        s1 = unitpropagate s
+        f = formula s1
+        r = record s1
+        l = chooseLiteral f
+        rl = l:r
+        res = dpll $ SolverState (simplify f l) rl
+        n = l * (-1)
 
 unitpropagate :: SolverState -> SolverState
-unitpropagate s = let prop f r = if (empty f) || (containsEmpty f) || not (unit f)
-                                 then SolverState f r
-                                 else let l = chooseUnit f
-                                      in prop (simplify f l) (l:r)
-                      f = formula s
-                      r = record s
-                  in prop f r
+unitpropagate (SolverState [] r) = SolverState [] r
+unitpropagate s
+    | containsEmpty f || not (unit f) = SolverState f r
+    | otherwise = unitpropagate $ SolverState (sfl) (lr)
+    where
+        f = formula s
+        r = record s
+        l = chooseUnit f
+        sfl = simplify f l
+        lr = l:r
 
 chooseLiteral :: Formula -> Literal
-chooseLiteral f = let c = head f
-                  in if not (empty c) then head c else chooseLiteral (tail f)
+chooseLiteral f
+    | null c = chooseLiteral t
+    | otherwise = head c
+    where
+        c = head f
+        t = tail f
 
 simplify :: Formula -> Literal -> Formula
-simplify f l = let simp f l g = if empty f then g
-                                else let c = head f
-                                         r = tail f
-                                     in if clauseSat c l then simp r l g
-                                        else simp r l ((simpClause c l):g)
-               in simp f l []
-
-clauseSat :: Clause -> Literal -> Bool
-clauseSat c l = if empty c then False
-                else let m = head c
-                     in if l == m then True
-                        else clauseSat (tail c) l
+simplify [] l = []
+simplify f l = [ simpClause x l | x <- f, not (clauseSat x l) ]
 
 simpClause :: Clause -> Literal -> Clause
-simpClause c l = let sc c l d = if empty c then d
-                                else let m = head c
-                                         r = tail c
-                                     in if l == (m * (-1)) then sc r l d
-                                        else sc r l (m:d)
-                 in sc c l []
+simpClause [] l = []
+simpClause c l = [ x | x <- c, x /= l * (-1) ]
+
+clauseSat :: Clause -> Literal -> Bool
+clauseSat [] l = False
+clauseSat (x:xs) l
+    | l == x = True
+    | otherwise = clauseSat xs l
 
 containsEmpty :: Formula -> Bool
 containsEmpty [] = False
-containsEmpty f = let c = head f
-                  in if empty c then True else containsEmpty (tail f)
+containsEmpty (x:xs)
+    | null x = True
+    | otherwise = containsEmpty xs
 
 chooseUnit :: Formula -> Literal
 chooseUnit f = let c = head f
@@ -75,9 +72,9 @@ chooseUnit f = let c = head f
 
 unit :: Formula -> Bool
 unit [] = False
-unit f = let c = head f
-             r = tail f
-         in if (length c) == 1 then True else unit r
+unit (x:xs)
+    | length x == 1 = True
+    | otherwise = unit xs
 
 solve :: [[Integer]] -> (Bool,[Integer])
 solve f = let result = dpll (SolverState f [])
