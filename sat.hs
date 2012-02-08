@@ -39,12 +39,8 @@ unitpropagate s
         lr = l:r
 
 chooseLiteral :: Formula -> Literal
-chooseLiteral f
-    | null c = chooseLiteral t
-    | otherwise = head c
-    where
-        c = head f
-        t = tail f
+chooseLiteral ([]:xs) = chooseLiteral xs
+chooseLiteral (x:xs) = (\(y:ys) -> y) x
 
 simplify :: Formula -> Literal -> Formula
 simplify [] l = []
@@ -56,15 +52,11 @@ simpClause c l = [ x | x <- c, x /= l * (-1) ]
 
 clauseSat :: Clause -> Literal -> Bool
 clauseSat [] l = False
-clauseSat (x:xs) l
-    | l == x = True
-    | otherwise = clauseSat xs l
+clauseSat c l = or $ [ x == l | x <- c ]
 
 containsEmpty :: Formula -> Bool
 containsEmpty [] = False
-containsEmpty (x:xs)
-    | null x = True
-    | otherwise = containsEmpty xs
+containsEmpty f = or $ [ x == [] | x <- f ]
 
 chooseUnit :: Formula -> Literal
 chooseUnit f = let c = head f
@@ -72,9 +64,7 @@ chooseUnit f = let c = head f
 
 unit :: Formula -> Bool
 unit [] = False
-unit (x:xs)
-    | length x == 1 = True
-    | otherwise = unit xs
+unit f = and $ [ (\(y:ys) -> ys == []) x | x <- f ]
 
 solve :: [[Integer]] -> (Bool,[Integer])
 solve f = let result = dpll (SolverState f [])
