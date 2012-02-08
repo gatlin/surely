@@ -38,6 +38,10 @@ unitpropagate s
         sfl = simplify f l
         lr = l:r
 
+notUnit :: Maybe Literal -> Bool
+notUnit (Just x) = True
+notUnit (Nothing) = False
+
 chooseLiteral :: Formula -> Literal
 chooseLiteral ([]:xs) = chooseLiteral xs
 chooseLiteral (x:xs) = (\(y:ys) -> y) x
@@ -59,8 +63,12 @@ containsEmpty [] = False
 containsEmpty f = or $ [ x == [] | x <- f ]
 
 chooseUnit :: Formula -> Literal
-chooseUnit f = let c = head f
-               in if 1 == (length c) then head c else chooseUnit $ tail f
+chooseUnit (x:xs)
+    | isUnit x = extractUnit x
+    | otherwise = chooseUnit xs
+    where
+        isUnit (y:ys) = ys == []
+        extractUnit (y:ys) = y
 
 unit :: Formula -> Bool
 unit [] = False
