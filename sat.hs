@@ -46,7 +46,7 @@ simplify f l = [ simpClause x l | x <- f, not (clauseSat x l) ]
 
 simpClause :: Clause -> Literal -> Clause
 simpClause [] l = []
-simpClause c l = [ x | x <- c, x /= l * (-1) ]
+simpClause c l = [ x | x <- c, x /= -l ]
 
 clauseSat :: Clause -> Literal -> Bool
 clauseSat [] l = False
