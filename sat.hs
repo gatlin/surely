@@ -1,3 +1,5 @@
+import Data.Maybe
+
 type Literal = Integer
 type Clause = [Literal]
 type Formula = [Clause]
@@ -15,32 +17,28 @@ dpll :: SolverState -> Result
 dpll (SolverState [] r) = Result True r
 dpll s
     | containsEmpty f = Result False []
-    | sat res = res
-    | otherwise = dpll $ SolverState (simplify f n) (n:r)
+    | otherwise = case sat res of
+            True -> res
+            False -> dpll $ SolverState (simplify f (-l)) ((-l):r)
     where
         s1 = unitpropagate s
         f = formula s1
         r = record s1
-        l = chooseLiteral f
-        rl = l:r
-        res = dpll $ SolverState (simplify f l) rl
-        n = l * (-1)
+        l = (fromJust . chooseLiteral) f
+        res = dpll $ SolverState (simplify f l) (l:r)
 
 unitpropagate :: SolverState -> SolverState
 unitpropagate (SolverState [] r) = SolverState [] r
 unitpropagate s
-    | containsEmpty f || not (unit f) = SolverState f r
-    | otherwise = unitpropagate $ SolverState (sfl) (lr)
+    | containsEmpty f || isNothing u = SolverState f r
+    | otherwise = unitpropagate $ SolverState (simplify f (fromJust u)) ((fromJust u):r)
     where
         f = formula s
         r = record s
-        l = chooseUnit f
-        sfl = simplify f l
-        lr = l:r
+        u = getUnit f
 
-chooseLiteral :: Formula -> Literal
-chooseLiteral ([]:xs) = chooseLiteral xs
-chooseLiteral (x:xs) = (\(y:ys) -> y) x
+chooseLiteral :: Formula -> Maybe Literal
+chooseLiteral xs = listToMaybe [ x | x:_ <- xs ]
 
 simplify :: Formula -> Literal -> Formula
 simplify [] l = []
@@ -58,17 +56,8 @@ containsEmpty :: Formula -> Bool
 containsEmpty [] = False
 containsEmpty f = or $ [ x == [] | x <- f ]
 
-chooseUnit :: Formula -> Literal
-chooseUnit (x:xs)
-    | isUnit x = extractUnit x
-    | otherwise = chooseUnit xs
-    where
-        isUnit (y:ys) = ys == []
-        extractUnit (y:ys) = y
-
-unit :: Formula -> Bool
-unit [] = False
-unit f = and $ [ (\(y:ys) -> ys == []) x | x <- f ]
+getUnit :: Formula -> Maybe Literal
+getUnit xs = listToMaybe [ x | [x] <- xs ]
 
 solve :: [[Integer]] -> (Bool,[Integer])
 solve f = let result = dpll (SolverState f [])
