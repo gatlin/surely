@@ -38,10 +38,6 @@ unitpropagate s
         sfl = simplify f l
         lr = l:r
 
-notUnit :: Maybe Literal -> Bool
-notUnit (Just x) = True
-notUnit (Nothing) = False
-
 chooseLiteral :: Formula -> Literal
 chooseLiteral ([]:xs) = chooseLiteral xs
 chooseLiteral (x:xs) = (\(y:ys) -> y) x
