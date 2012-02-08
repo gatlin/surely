@@ -50,11 +50,11 @@ simpClause c l = [ x | x <- c, x /= l * (-1) ]
 
 clauseSat :: Clause -> Literal -> Bool
 clauseSat [] l = False
-clauseSat c l = or $ [ x == l | x <- c ]
+clauseSat c l = or [ x == l | x <- c ]
 
 containsEmpty :: Formula -> Bool
 containsEmpty [] = False
-containsEmpty f = or $ [ x == [] | x <- f ]
+containsEmpty f = or [ x == [] | x <- f ]
 
 getUnit :: Formula -> Maybe Literal
 getUnit xs = listToMaybe [ x | [x] <- xs ]
