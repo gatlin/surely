@@ -17,15 +17,16 @@ dpll :: SolverState -> Result
 dpll (SolverState [] r) = Result True r
 dpll s
     | containsEmpty f = Result False []
-    | otherwise = case sat res of
-            True -> res
-            False -> dpll $ SolverState (simplify f (-l)) ((-l):r)
+    | sat resl = resl
+    | otherwise = resn
     where
         s1 = unitpropagate s
         f = formula s1
         r = record s1
         l = (fromJust . chooseLiteral) f
-        res = dpll $ SolverState (simplify f l) (l:r)
+        runDpll a = dpll $ SolverState (simplify f a) (a:r)
+        resl = runDpll l
+        resn = runDpll (-l)
 
 unitpropagate :: SolverState -> SolverState
 unitpropagate (SolverState [] r) = SolverState [] r
