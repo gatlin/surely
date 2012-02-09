@@ -39,9 +39,7 @@ unitpropagate s
         u = getUnit f
 
 chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral xs
-    | containsEmpty xs = Nothing
-    | otherwise = listToMaybe [ x | x:_ <- xs ]
+chooseLiteral xs = listToMaybe [ x | x:_ <- xs ]
 
 simplify :: Formula -> Literal -> Formula
 simplify [] l = []
@@ -55,14 +53,8 @@ clauseSat :: Clause -> Literal -> Bool
 clauseSat [] l = False
 clauseSat c l = or [ x == l | x <- c ]
 
-containsEmpty :: Formula -> Bool
-containsEmpty [] = False
-containsEmpty f = or [ x == [] | x <- f ]
-
 getUnit :: Formula -> Maybe Literal
-getUnit xs
-    | containsEmpty xs = Nothing
-    | otherwise = listToMaybe [ x | [x] <- xs ]
+getUnit xs = listToMaybe [ x | [x] <- xs ]
 
 solve :: [[Integer]] -> (Bool,[Integer])
 solve f = let result = dpll (SolverState f [])
