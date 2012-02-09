@@ -16,22 +16,22 @@ data Result = Result { sat :: Bool
 dpll :: SolverState -> Result
 dpll (SolverState [] r) = Result True r
 dpll s
-    | containsEmpty f = Result False []
+    | isNothing l = Result False []
     | sat resl = resl
     | otherwise = resn
     where
         s1 = unitpropagate s
         f = formula s1
         r = record s1
-        l = (fromJust . chooseLiteral) f
+        l = chooseLiteral f
         runDpll a = dpll $ SolverState (simplify f a) (a:r)
-        resl = runDpll l
-        resn = runDpll (-l)
+        resl = runDpll $ fromJust l
+        resn = runDpll $ fromJust $ fmap negate l
 
 unitpropagate :: SolverState -> SolverState
 unitpropagate (SolverState [] r) = SolverState [] r
 unitpropagate s
-    | containsEmpty f || isNothing u = SolverState f r
+    | isNothing u = SolverState f r
     | otherwise = unitpropagate $ SolverState (simplify f (fromJust u)) ((fromJust u):r)
     where
         f = formula s
@@ -39,7 +39,9 @@ unitpropagate s
         u = getUnit f
 
 chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral xs = listToMaybe [ x | x:_ <- xs ]
+chooseLiteral xs
+    | containsEmpty xs = Nothing
+    | otherwise = listToMaybe [ x | x:_ <- xs ]
 
 simplify :: Formula -> Literal -> Formula
 simplify [] l = []
@@ -58,7 +60,9 @@ containsEmpty [] = False
 containsEmpty f = or [ x == [] | x <- f ]
 
 getUnit :: Formula -> Maybe Literal
-getUnit xs = listToMaybe [ x | [x] <- xs ]
+getUnit xs
+    | containsEmpty xs = Nothing
+    | otherwise = listToMaybe [ x | [x] <- xs ]
 
 solve :: [[Integer]] -> (Bool,[Integer])
 solve f = let result = dpll (SolverState f [])
