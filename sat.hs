@@ -1,5 +1,4 @@
 import Data.Maybe
-import Control.Applicative
 import Control.Monad
 
 type Literal = Integer
