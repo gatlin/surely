@@ -14,17 +14,15 @@ data SolverState = SolverState { formula :: Formula
 dpll :: SolverState -> Maybe Record
 dpll (SolverState [] r) = return r
 dpll (SolverState f r) = do
-    case chooseLiteral f of
-        Just l -> do
-            case dpll (SolverState (simplify f l) (l:r)) of
-                Just record -> return record
-                Nothing -> do
-                    n <- return $ negate l
-                    dpll (SolverState (simplify f n) (n:r))
-        Nothing -> Nothing
+    l <- chooseLiteral f
+    case dpll (SolverState (simplify f l) (l:r)) of
+        Just record -> return record
+        Nothing -> do
+            n <- return $ negate l
+            dpll (SolverState (simplify f n) (n:r))
 
 unitpropagate :: SolverState -> Maybe SolverState
-unitpropagate (SolverState f r) = do
+unitpropagate (SolverState f r) =
     case getUnit f of
         Nothing -> return $ SolverState f r
         Just u -> unitpropagate $ SolverState (simplify f u) (u:r)
