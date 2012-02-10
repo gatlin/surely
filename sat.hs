@@ -13,23 +13,18 @@ data SolverState = SolverState { formula :: Formula
 
 dpll :: SolverState -> Maybe Record
 dpll (SolverState [] r) = return r
-dpll (SolverState [[l]] r) = return (l:r)
-dpll s = do
-    s' <- unitpropagate s
-    f  <- return $ formula s'
-    r  <- return $ record s'
-    l  <- chooseLiteral f
-    n  <- return $ negate l
-    let resl = dpll $ SolverState (simplify f l) (l:r)
-    let resn = dpll $ SolverState (simplify f n) (n:r)
-    case resl of
-        Just record -> return record
-        Nothing -> resn
+dpll (SolverState f r) = do
+    case chooseLiteral f of
+        Just l -> do
+            case dpll (SolverState (simplify f l) (l:r)) of
+                Just record -> return record
+                Nothing -> do
+                    n <- return $ negate l
+                    dpll (SolverState (simplify f n) (n:r))
+        Nothing -> Nothing
 
 unitpropagate :: SolverState -> Maybe SolverState
-unitpropagate s = do
-    f <- return $ formula s
-    r <- return $ record s
+unitpropagate (SolverState f r) = do
     case getUnit f of
         Nothing -> return $ SolverState f r
         Just u -> unitpropagate $ SolverState (simplify f u) (u:r)
@@ -52,3 +47,5 @@ clauseSat c l = or [ x == l | x <- c ]
 getUnit :: Formula -> Maybe Literal
 getUnit xs = listToMaybe [ x | [x] <- xs ]
 
+solve :: [[Integer]] -> Maybe [Integer]
+solve f = dpll $ SolverState f []
