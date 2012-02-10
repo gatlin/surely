@@ -1,4 +1,6 @@
 import Data.Maybe
+import Control.Applicative
+import Control.Monad
 
 type Literal = Integer
 type Clause = [Literal]
@@ -9,34 +11,28 @@ data SolverState = SolverState { formula :: Formula
                                , record :: Record
                                } deriving (Show)
 
-data Result = Result { sat :: Bool
-                     , answer :: Record
-                     } deriving (Show)
+dpll :: SolverState -> Maybe Record
+dpll (SolverState [] r) = return r
+dpll (SolverState [[l]] r) = return (l:r)
+dpll s = do
+    s' <- unitpropagate s
+    f  <- return $ formula s'
+    r  <- return $ record s'
+    l  <- chooseLiteral f
+    n  <- return $ negate l
+    let resl = dpll $ SolverState (simplify f l) (l:r)
+    let resn = dpll $ SolverState (simplify f n) (n:r)
+    case resl of
+        Just record -> return record
+        Nothing -> resn
 
-dpll :: SolverState -> Result
-dpll (SolverState [] r) = Result True r
-dpll s
-    | isNothing l = Result False []
-    | sat resl = resl
-    | otherwise = resn
-    where
-        s1 = unitpropagate s
-        f = formula s1
-        r = record s1
-        l = chooseLiteral f
-        runDpll a = dpll $ SolverState (simplify f a) (a:r)
-        resl = runDpll $ fromJust l
-        resn = runDpll $ fromJust $ fmap negate l
-
-unitpropagate :: SolverState -> SolverState
-unitpropagate (SolverState [] r) = SolverState [] r
-unitpropagate s
-    | isNothing u = SolverState f r
-    | otherwise = unitpropagate $ SolverState (simplify f (fromJust u)) ((fromJust u):r)
-    where
-        f = formula s
-        r = record s
-        u = getUnit f
+unitpropagate :: SolverState -> Maybe SolverState
+unitpropagate s = do
+    f <- return $ formula s
+    r <- return $ record s
+    case getUnit f of
+        Nothing -> return $ SolverState f r
+        Just u -> unitpropagate $ SolverState (simplify f u) (u:r)
 
 chooseLiteral :: Formula -> Maybe Literal
 chooseLiteral xs = listToMaybe [ x | x:_ <- xs ]
@@ -56,6 +52,3 @@ clauseSat c l = or [ x == l | x <- c ]
 getUnit :: Formula -> Maybe Literal
 getUnit xs = listToMaybe [ x | [x] <- xs ]
 
-solve :: [[Integer]] -> (Bool,[Integer])
-solve f = let result = dpll (SolverState f [])
-          in (sat result, answer result)
