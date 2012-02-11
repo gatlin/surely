@@ -35,6 +35,9 @@ unitpropagate (SolverState f r) =
 chooseLiteral :: Formula -> Maybe Literal
 chooseLiteral xs = listToMaybe [ x | x:_ <- xs ]
 
+getUnit :: Formula -> Maybe Literal
+getUnit xs = listToMaybe [ x | [x] <- xs ]
+
 simplify :: Formula -> Literal -> Formula
 simplify [] l = []
 simplify f l = [ simpClause x l | x <- f, not (clauseSat x l) ]
@@ -46,9 +49,6 @@ simpClause c l = [ x | x <- c, x /= -l ]
 clauseSat :: Clause -> Literal -> Bool
 clauseSat [] l = False
 clauseSat c l = or [ x == l | x <- c ]
-
-getUnit :: Formula -> Maybe Literal
-getUnit xs = listToMaybe [ x | [x] <- xs ]
 
 solve :: [[Integer]] -> Maybe [Integer]
 solve f = dpll $ SolverState f []
