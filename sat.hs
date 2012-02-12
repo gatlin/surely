@@ -32,7 +32,7 @@ unitpropagate (SolverState f r) =
         Just u -> unitpropagate $ SolverState (simplify f u) (u:r)
 
 chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral = listToMaybe . concat 
+chooseLiteral = listToMaybe . concat
 
 getUnit :: Formula -> Maybe Literal
 getUnit xs = listToMaybe [ x | [x] <- xs ]
