@@ -18,9 +18,8 @@ dpll s =
         l  <- chooseLiteral f
         case dpll (SolverState (simplify f l) (l:r)) of
             Just record -> return record
-            Nothing -> do
-                n <- return $ negate l
-                dpll $ SolverState (simplify f n) (n:r)
+            Nothing -> dpll $ SolverState (simplify f n) (n:r)
+                where n = -l
     where
         s' = unitpropagate s
         f = formula s'
@@ -33,7 +32,7 @@ unitpropagate (SolverState f r) =
         Just u -> unitpropagate $ SolverState (simplify f u) (u:r)
 
 chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral xs = listToMaybe [ x | x:_ <- xs ]
+chooseLiteral = listToMaybe . concat 
 
 getUnit :: Formula -> Maybe Literal
 getUnit xs = listToMaybe [ x | [x] <- xs ]
