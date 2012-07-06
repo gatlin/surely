@@ -41,7 +41,7 @@ simplify :: Formula -> Literal -> Formula
 simplify f l = [ simpClause x l | x <- f, not (clauseSat x l) ]
 
 simpClause :: Clause -> Literal -> Clause
-simpClause c = flip (.) ((/=) . negate) (flip filter c)
+simpClause = flip (.) ((/=) . negate) . flip filter
 
 clauseSat :: Clause -> Literal -> Bool
 clauseSat = flip elem
