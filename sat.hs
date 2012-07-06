@@ -41,10 +41,10 @@ simplify :: Formula -> Literal -> Formula
 simplify f l = [ simpClause x l | x <- f, not (clauseSat x l) ]
 
 simpClause :: Clause -> Literal -> Clause
-simpClause c l = filter (/= -l) c
+simpClause c = flip (.) ((/=) . negate) (flip filter c)
 
 clauseSat :: Clause -> Literal -> Bool
-clauseSat c l = elem l c
+clauseSat = flip elem
 
 solve :: [[Integer]] -> Maybe [Integer]
-solve f = dpll $ SolverState f []
+solve = dpll . flip SolverState []
