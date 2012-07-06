@@ -32,22 +32,19 @@ unitpropagate (SolverState f r) =
         Just u -> unitpropagate $ SolverState (simplify f u) (u:r)
 
 chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral = listToMaybe . concat 
+chooseLiteral = listToMaybe . concat
 
 getUnit :: Formula -> Maybe Literal
 getUnit xs = listToMaybe [ x | [x] <- xs ]
 
 simplify :: Formula -> Literal -> Formula
-simplify [] l = []
 simplify f l = [ simpClause x l | x <- f, not (clauseSat x l) ]
 
 simpClause :: Clause -> Literal -> Clause
-simpClause [] l = []
-simpClause c l = [ x | x <- c, x /= -l ]
+simpClause c l = filter (/= -l) c
 
 clauseSat :: Clause -> Literal -> Bool
-clauseSat [] l = False
-clauseSat c l = or [ x == l | x <- c ]
+clauseSat c l = elem l c
 
 solve :: [[Integer]] -> Maybe [Integer]
 solve f = dpll $ SolverState f []
