@@ -47,4 +47,4 @@ clauseSat :: Clause -> Literal -> Bool
 clauseSat c l = elem l c
 
 solve :: [[Integer]] -> Maybe [Integer]
-solve f = dpll $ SolverState f []
+solve = dpll . flip SolverState []
