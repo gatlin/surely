@@ -45,7 +45,7 @@ simpClause :: Clause -> Literal -> Clause
 simpClause c l = filter (/= -l) c
 
 clauseSat :: Clause -> Literal -> Bool
-clauseSat c l = elem l c
+clauseSat = flip elem
 
 solve :: [[Integer]] -> Maybe [Integer]
 solve = dpll . flip SolverState []
