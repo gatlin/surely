@@ -30,7 +30,6 @@ data SolverState = SolverState { formula :: !Formula
 
 -- | The core algorithm, a simple back-tracking search with unitpropagation.
 dpll :: SolverState -> Maybe Record
-dpll (SolverState [] r) = return r
 dpll s
     | null f = return r
     | otherwise = do
