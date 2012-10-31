@@ -1,0 +1,30 @@
+name:                surely
+version:             0.1
+synopsis:            A SAT solving algorithm exploiting Maybe
+description:
+    .
+    A simple DPLL-inspired SAT solving algorithm, exploiting Maybe for
+    backtracking. The goal is elegance.
+    .
+    This library provides one function, solve, which accepts a list of list of
+    integers representing a conjunction of disjunctions of unique literals. The
+    polarity (+,-) of a literal determines its truth value.
+    .
+    TODO -> Backjumping and conflict-driven learning
+    .
+homepage:            https://github.com/gatlin/surely
+bug-reports:         https://github.com/gatlin/surely/issues
+license:             LGPL
+license-file:        LICENSE
+author:              Gatlin Johnson <rokenrol@gmail.com>
+maintainer:          Gatlin Johnson <rokenrol@gmail.com>
+-- copyright:
+category:            AI
+build-type:          Simple
+cabal-version:       >=1.8
+
+library
+  exposed-modules:     AI.Surely
+  other-modules:
+  build-depends:       base ==4.5.*,
+  ghc-options:         -O2 -funbox-strict-fields -Wall
