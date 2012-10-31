@@ -9,11 +9,8 @@
 -- Portability      : GHC
 --
 -- This module defines a simple SAT solving algorithm exploiting the properties
--- of Maybe. It is based on [Nieuwenhuis et al, 2006][dpll].
---
--- Priorities: simplicity, efficiency, and sophistication, in that order.
---
--- [dpll]: (https://cs.uwaterloo.ca/~david/cl/dpll-abstract.pdf)
+-- of Maybe. Algorithms are based on the paper available at
+-- https://cs.uwaterloo.ca/~david/cl/dpll-abstract.pdf.
 
 module AI.Surely (solve) where
 import Data.Maybe

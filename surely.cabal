@@ -4,7 +4,8 @@ synopsis:            A SAT solving algorithm exploiting Maybe
 description:
     .
     A simple DPLL-inspired SAT solving algorithm, exploiting Maybe for
-    backtracking. The goal is elegance.
+    backtracking. The goals of this implementation are simplicity, efficiency,
+    and sophistication, in that order.
     .
     This library provides one function, solve, which accepts a list of list of
     integers representing a conjunction of disjunctions of unique literals. The
