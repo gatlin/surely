@@ -1,4 +1,6 @@
-module Sat where
+{-# LANGUAGE BangPatterns #-}
+
+module AI.Surely (solve) where
 import Data.Maybe
 import Control.Monad
 
@@ -7,24 +9,26 @@ type Clause = [Literal]
 type Formula = [Clause]
 type Record = [Literal]
 
-data SolverState = SolverState { formula :: Formula
-                               , record :: Record
+data SolverState = SolverState { formula :: !Formula
+                               , record  :: !Record
                                } deriving (Show)
 
 dpll :: SolverState -> Maybe Record
 dpll (SolverState [] r) = return r
-dpll s =
-    if null f then return r
-    else do
+dpll s
+    | null f = return r
+    | otherwise = do
         l  <- chooseLiteral f
         case dpll (SolverState (simplify f l) (l:r)) of
             Just record -> return record
-            Nothing -> dpll $ SolverState (simplify f n) (n:r)
-                where n = -l
+            Nothing -> dpll $! SolverState (simplify f (-l)) ((-l):r)
     where
         s' = unitpropagate s
+        {-# INLINE s' #-}
         f = formula s'
+        {-# INLINE f  #-}
         r = record s'
+        {-# INLINE r  #-}
 
 unitpropagate :: SolverState -> SolverState
 unitpropagate (SolverState f r) =
@@ -33,19 +37,16 @@ unitpropagate (SolverState f r) =
         Just u -> unitpropagate $ SolverState (simplify f u) (u:r)
 
 chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral = listToMaybe . concat
+chooseLiteral !f = listToMaybe . concat $! f
 
 getUnit :: Formula -> Maybe Literal
-getUnit xs = listToMaybe [ x | [x] <- xs ]
+getUnit !xs = listToMaybe [ x | [x] <- xs ]
 
 simplify :: Formula -> Literal -> Formula
-simplify f l = [ simpClause x l | x <- f, not (clauseSat x l) ]
-
-simpClause :: Clause -> Literal -> Clause
-simpClause c l = filter (/= -l) c
-
-clauseSat :: Clause -> Literal -> Bool
-clauseSat = flip elem
+simplify !f !l = [ simpClause x l | x <- f, not (elem l x) ]
+    where
+        simpClause c l = filter (/= -l) c
+        {-# INLINE simpClause #-}
 
 solve :: [[Integer]] -> Maybe [Integer]
 solve = dpll . flip SolverState []
