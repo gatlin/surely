@@ -26,5 +26,5 @@ cabal-version:       >=1.8
 library
   exposed-modules:     AI.Surely
   other-modules:
-  build-depends:       base ==4.5.*,
+  build-depends:       base == 4.5.*
   ghc-options:         -O2 -funbox-strict-fields -Wall
