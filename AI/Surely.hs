@@ -80,5 +80,7 @@ simplify !f !l = [ simpClause x l | x <- f, not (elem l x) ]
         {-# INLINE simpClause #-}
 
 -- | The top-level function wrapping `dpll` and hiding the library internals.
+--   Accepts a list of lists of Integers, treating the outer list as a
+--   conjunction and the inner lists as disjunctions.
 solve :: [[Integer]] -> Maybe [Integer]
 solve = dpll . flip SolverState []
