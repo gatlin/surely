@@ -34,9 +34,7 @@ dpll s
     | null f = return r
     | otherwise = do
         l  <- chooseLiteral f
-        return $! oneOf
-            (try l)
-            (try (-l))
+        return $! oneOf [l, (-l)]
     where
         s' = unitpropagate s
         {-# INLINE s' #-}
@@ -44,7 +42,7 @@ dpll s
         {-# INLINE f  #-}
         r = record s'
         {-# INLINE r  #-}
-        oneOf !a !b = head . catMaybes $! [a,b]
+        oneOf !xs = head . catMaybes . map try $! xs
         {-# INLINE oneOf #-}
         try !lit =
             dpll $! SolverState (simplify f lit) (lit:r)
