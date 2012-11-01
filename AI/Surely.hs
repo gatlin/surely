@@ -8,8 +8,9 @@
 -- Stability        : experimental
 -- Portability      : GHC
 --
--- This module defines a simple SAT solving algorithm exploiting the properties
--- of Maybe. Algorithms are based on the paper available at
+-- Simple SAT and (soon!) SMT algorithms exploiting the properties of Maybe.
+--
+-- Based on the work at:
 -- https://cs.uwaterloo.ca/~david/cl/dpll-abstract.pdf.
 
 module AI.Surely (solve) where
@@ -53,12 +54,14 @@ unitpropagate (SolverState f r) =
         Nothing -> SolverState f r
         Just u -> unitpropagate $ SolverState (simplify f u) (u:r)
 
--- | Returns a `Just Literal` or Nothing if the formula has no literals left.
---   Since the argument was checked to see if it was null in a previous step,
---   failure to find a literal means the formula only contains empty clauses,
---   implying the problem is unsatisfiable and `dpll` will backtrack.
+-- | Returns a `Just Literal` or Nothing if the formula has a contradiction.
+--   If this yields `Nothing` then the algorithm will backtrack.
 chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral !f = listToMaybe . concat $! f
+chooseLiteral !(f@(x:xs))
+    | contradiction = Nothing
+    | otherwise     = Just (head x)
+    where
+        contradiction = and $! map (isJust . listToMaybe) f
 
 -- | If a unit clause (singleton list) exists in the formula, return the
 --   literal inside it, or Nothing.

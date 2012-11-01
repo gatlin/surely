@@ -18,6 +18,17 @@ thus equivalent to all other NP-complete problems. SAT solvers are useful,
 then, because if a mapping exists from a problem to a SAT instance, a SAT
 solver can be used to find a solution.
 
+0.1 SMT
+---
+
+A conceputal extension to SAT is SAT Modulo Theories, or *SMT*. SMT is the same
+basic idea, except solutions found by the main algorithm are checked against a
+*theory*, or set of additional propositional formulas. If the check fails, a
+*reason* is computed, in the form of new clauses to add to the original
+problem, and SAT is started again.
+
+I have not implemented this, but it is a primary goal of the library.
+
 1. The interface
 ---
 
@@ -53,6 +64,7 @@ solving algorithm (in that order).
 - Backjumping
 - Conflict-driven learning
 - I can probably choose an alternative to list with better memory guarantees
+- SMT support (ie, you provide a test function when calling solve)
 
 [1]: http://en.wikipedia.org/wiki/Propositional_calculus
 [2]: http://en.wikipedia.org/wiki/NP-complete

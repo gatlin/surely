@@ -1,11 +1,10 @@
 name:                surely
 version:             0.1
-synopsis:            A SAT solving algorithm exploiting Maybe
+synopsis:            A SAT/SMT solving algorithm exploiting Maybe
 description:
     .
-    A simple DPLL-inspired SAT solving algorithm, exploiting Maybe for
-    backtracking. The goals of this implementation are simplicity, efficiency,
-    and sophistication, in that order.
+    Simple algorithm to solve a SAT or (coming soon) Lazy SMT problem instance,
+    Maybe.
     .
     This library provides one function, solve, which accepts a list of list of
     integers representing a conjunction of disjunctions of unique literals. The
