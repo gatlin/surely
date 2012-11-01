@@ -18,8 +18,7 @@ thus equivalent to all other NP-complete problems. SAT solvers are useful,
 then, because if a mapping exists from a problem to a SAT instance, a SAT
 solver can be used to find a solution.
 
-0.1 SMT
----
+### 0.1 SMT
 
 A conceputal extension to SAT is SAT Modulo Theories, or *SMT*. SMT is the same
 basic idea, except solutions found by the main algorithm are checked against a
