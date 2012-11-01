@@ -35,8 +35,8 @@ dpll s
     | otherwise = do
         l  <- chooseLiteral f
         return $! oneOf
-            (recurse f r l)
-            (recurse f r (-l))
+            (try f r l)
+            (try f r (-l))
     where
         s' = unitpropagate s
         {-# INLINE s' #-}
@@ -46,9 +46,9 @@ dpll s
         {-# INLINE r  #-}
         oneOf !a !b = head . catMaybes $! [a,b]
         {-# INLINE oneOf #-}
-        recurse !frm !rec !lit =
+        try !frm !rec !lit =
             dpll $! SolverState (simplify frm lit) (lit:rec)
-        {-# INLINE recurse #-}
+        {-# INLINE try #-}
 
 -- | unitpropagate simplifies the formula for every variable in a unit clause
 --   (that is, a clause with only one unit).
