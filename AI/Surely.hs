@@ -42,7 +42,7 @@ dpll s
         {-# INLINE f  #-}
         r = record s'
         {-# INLINE r  #-}
-        oneOf !a !b = head . catMaybes . map try $! [a,b]
+        oneOf !a !b = head . catMaybes . map try $ [a,b]
         {-# INLINE oneOf #-}
         try !lit =
             dpll $! SolverState (simplify f lit) (lit:r)
@@ -88,5 +88,7 @@ simplify !f !l = [ simpClause x l | x <- f, not (elem l x) ]
 -- | The top-level function wrapping `dpll` and hiding the library internals.
 --   Accepts a list of lists of Integers, treating the outer list as a
 --   conjunction and the inner lists as disjunctions.
-solve :: [[Integer]] -> Maybe [Integer]
+solve :: [[Integer]]     -- ^ CNF formula, represented as [[Integer]]
+      -> Maybe [Integer] -- ^ Just a list of literals considered true, or Nothing
 solve = dpll . flip SolverState []
+{-# INLINE solve #-}
