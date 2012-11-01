@@ -15,7 +15,6 @@
 
 module AI.Surely (solve) where
 import Data.Maybe
-import Control.Monad
 
 type Literal = Integer
 type Clause  = [Literal]
@@ -36,7 +35,7 @@ dpll s
     | otherwise = do
         l  <- chooseLiteral f
         case dpll (SolverState (simplify f l) (l:r)) of
-            Just record -> return record
+            Just rec -> return rec
             Nothing -> dpll $! SolverState (simplify f (-l)) ((-l):r)
     where
         s' = unitpropagate s
@@ -57,7 +56,9 @@ unitpropagate (SolverState f r) =
 -- | Returns a `Just Literal` or Nothing if the formula has a contradiction.
 --   If this yields `Nothing` then the algorithm will backtrack.
 chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral !(f@(x:xs))
+chooseLiteral []    = Nothing
+chooseLiteral [[]]  = Nothing
+chooseLiteral !(f@(x:_))
     | contradiction = Nothing
     | otherwise     = Just (head x)
     where
@@ -78,7 +79,7 @@ getUnit !xs = listToMaybe [ x | [x] <- xs ]
 simplify :: Formula -> Literal -> Formula
 simplify !f !l = [ simpClause x l | x <- f, not (elem l x) ]
     where
-        simpClause c l = filter (/= -l) c
+        simpClause c' l' = filter (/= -l') c'
         {-# INLINE simpClause #-}
 
 -- | The top-level function wrapping `dpll` and hiding the library internals.
