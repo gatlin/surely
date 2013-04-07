@@ -31,10 +31,10 @@ data SolverState = SolverState { formula :: !Formula
 -- | The core algorithm, a simple back-tracking search with unitpropagation.
 dpll :: SolverState -> Maybe Record
 dpll s
-    | null f = return r
+    | null f    = Just r
     | otherwise = do
         l  <- chooseLiteral f
-        return $! oneOf l (-l)
+        oneOf l (-l)
     where
         s' = unitpropagate s
         {-# INLINE s' #-}
@@ -42,7 +42,7 @@ dpll s
         {-# INLINE f  #-}
         r = record s'
         {-# INLINE r  #-}
-        oneOf !a !b = head . catMaybes . map try $ [a,b]
+        oneOf !a !b = listToMaybe . catMaybes . map try $ [a,b]
         {-# INLINE oneOf #-}
         try !lit =
             dpll $! SolverState (simplify f lit) (lit:r)
