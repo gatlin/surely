@@ -31,18 +31,19 @@ data SolverState = SolverState { formula :: !Formula
 -- | The core algorithm, a simple back-tracking search with unitpropagation.
 dpll :: SolverState -> Maybe Record
 dpll s
-    | null f = return r
-    | otherwise = do
-        l  <- chooseLiteral f
-        return $! oneOf l (-l)
+    | null f    = Just r
+    | contra f  = Nothing
+    | otherwise = oneOf l (-l)
     where
+        l  = chooseLiteral f
+        {-# INLINE l #-}
         s' = unitpropagate s
         {-# INLINE s' #-}
         f = formula s'
         {-# INLINE f  #-}
         r = record s'
         {-# INLINE r  #-}
-        oneOf !a !b = head . catMaybes . map try $ [a,b]
+        oneOf !a !b = listToMaybe . catMaybes . map try $ [a,b]
         {-# INLINE oneOf #-}
         try !lit =
             dpll $! SolverState (simplify f lit) (lit:r)
@@ -58,14 +59,13 @@ unitpropagate (SolverState f r) =
 
 -- | Returns a `Just Literal` or Nothing if the formula has a contradiction.
 --   If this yields `Nothing` then the algorithm will backtrack.
-chooseLiteral :: Formula -> Maybe Literal
-chooseLiteral []    = Nothing
-chooseLiteral [[]]  = Nothing
-chooseLiteral !(f@(x:_))
-    | contradiction = Nothing
-    | otherwise     = Just (head x)
-    where
-        contradiction = and $! map (isJust . listToMaybe) f
+chooseLiteral :: Formula -> Literal
+chooseLiteral = head . head
+
+-- | Returns `True` if the formula is a contradiction, i.e. if there is an
+-- empty clause (that cannot be satisfied).
+contra :: Formula -> Bool
+contra = any null
 
 -- | If a unit clause (singleton list) exists in the formula, return the
 --   literal inside it, or Nothing.
