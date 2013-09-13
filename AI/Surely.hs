@@ -4,7 +4,7 @@
 -- Module           : AI.Surely
 -- Copyright        : 2012 Gatlin Johnson
 -- License          : LGPL 3.0
--- Maintainer       : rokenrol@gmail.com
+-- Maintainer       : gatlin@niltag.net
 -- Stability        : experimental
 -- Portability      : GHC
 --
