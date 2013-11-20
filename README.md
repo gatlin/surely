@@ -3,7 +3,7 @@ Surely
 
 An algorithm to find the boolean satisfiability of a formula, Maybe.
 
-(c) 2012 Gatlin Johnson <rokenrol@gmail.com>
+(c) 2012 Gatlin Johnson <gatlin@niltag.net>
 
 0. SAT Solving, briefly
 ---
