@@ -3,7 +3,7 @@ Surely
 
 An algorithm to find the boolean satisfiability of a formula, Maybe.
 
-(c) 2012 Gatlin Johnson <gatlin@niltag.net>
+(c) 2012-2013 Gatlin Johnson <gatlin@niltag.net>
 
 0. SAT Solving, briefly
 ---
@@ -18,7 +18,12 @@ thus equivalent to all other NP-complete problems. SAT solvers are useful,
 then, because if a mapping exists from a problem to a SAT instance, a SAT
 solver can be used to find a solution.
 
-### 0.1 SMT
+### 0.1 Parallelism
+
+So I decided to make this data-parallel using `monad-par`. You should compile
+programs with `-threaded` if you use this library.
+
+### 0.2 SMT
 
 A conceputal extension to SAT is SAT Modulo Theories, or *SMT*. SMT is the same
 basic idea, except solutions found by the main algorithm are checked against a
