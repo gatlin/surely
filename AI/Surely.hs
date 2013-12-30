@@ -52,9 +52,6 @@ dpll s
             a <- get i
             b <- get j
             return $ listToMaybe . catMaybes $ [a,b]
-        {-
-        oneOf !a !b = listToMaybe . catMaybes . map try $ [a,b]
-        -}
         {-# INLINE oneOf #-}
         try !lit =
             dpll $! SolverState (simplify f lit) (lit:r)
@@ -94,16 +91,10 @@ simplify :: Formula -> Literal -> Formula
 simplify !f !l = f'
     where
         simpClause l' c' = filter (/= -l') c'
+        {-# INLINE simpClause #-}
         f' = runPar $ do
             let lst = [ x | x <- f, not (elem l x) ]
             parMap (simpClause l) lst
-
-{-
-simplify !f !l = [ simpClause x l | x <- f, not (elem l x) ]
-    where
-        simpClause c' l' = filter (/= -l') c'
-        {-# INLINE simpClause #-}
--}
 
 -- | The top-level function wrapping `dpll` and hiding the library internals.
 --   Accepts a list of lists of Integers, treating the outer list as a
