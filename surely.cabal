@@ -1,5 +1,5 @@
 name:                surely
-version:             0.1
+version:             0.2
 synopsis:            A SAT/SMT solving algorithm exploiting Maybe
 description:
     .
@@ -16,8 +16,8 @@ homepage:            https://github.com/gatlin/surely
 bug-reports:         https://github.com/gatlin/surely/issues
 license:             LGPL
 license-file:        LICENSE
-author:              Gatlin Johnson <rokenrol@gmail.com>
-maintainer:          Gatlin Johnson <rokenrol@gmail.com>
+author:              Gatlin Johnson <gatlin@niltag.net>
+maintainer:          Gatlin Johnson <gatlin@niltag.net>
 -- copyright:
 category:            AI
 build-type:          Simple
@@ -26,5 +26,6 @@ cabal-version:       >=1.8
 library
   exposed-modules:     AI.Surely
   other-modules:
-  build-depends:       base == 4.5.*
-  ghc-options:         -O2 -funbox-strict-fields -Wall
+  build-depends:       base == 4.5.*,
+                       monad-par == 0.3.4.6
+  ghc-options:         -O2 -funbox-strict-fields -Wall -threaded

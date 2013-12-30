@@ -2,7 +2,7 @@
 
 -- |
 -- Module           : AI.Surely
--- Copyright        : 2012 Gatlin Johnson
+-- Copyright        : 2013 Gatlin Johnson
 -- License          : LGPL 3.0
 -- Maintainer       : gatlin@niltag.net
 -- Stability        : experimental
@@ -15,6 +15,7 @@
 
 module AI.Surely (solve) where
 import Data.Maybe
+import Control.Monad.Par
 
 type Literal = Integer
 type Clause  = [Literal]
@@ -43,7 +44,17 @@ dpll s
         {-# INLINE f  #-}
         r = record s'
         {-# INLINE r  #-}
+        oneOf !l1 !l2 = runPar $ do
+            i <- new
+            j <- new
+            fork $ put i $ try l1
+            fork $ put j $ try l2
+            a <- get i
+            b <- get j
+            return $ listToMaybe . catMaybes $ [a,b]
+        {-
         oneOf !a !b = listToMaybe . catMaybes . map try $ [a,b]
+        -}
         {-# INLINE oneOf #-}
         try !lit =
             dpll $! SolverState (simplify f lit) (lit:r)
@@ -80,10 +91,19 @@ getUnit !xs = listToMaybe [ x | [x] <- xs ]
 --   consider that value, and a disjunction with a true value is trivially
 --   satisfied.
 simplify :: Formula -> Literal -> Formula
+simplify !f !l = f'
+    where
+        simpClause l' c' = filter (/= -l') c'
+        f' = runPar $ do
+            let lst = [ x | x <- f, not (elem l x) ]
+            parMap (simpClause l) lst
+
+{-
 simplify !f !l = [ simpClause x l | x <- f, not (elem l x) ]
     where
         simpClause c' l' = filter (/= -l') c'
         {-# INLINE simpClause #-}
+-}
 
 -- | The top-level function wrapping `dpll` and hiding the library internals.
 --   Accepts a list of lists of Integers, treating the outer list as a
