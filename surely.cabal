@@ -1,5 +1,5 @@
 name:                surely
-version:             0.2
+version:             0.3
 synopsis:            A SAT/SMT solving algorithm exploiting Maybe
 description:
     .
@@ -21,11 +21,15 @@ maintainer:          Gatlin Johnson <gatlin@niltag.net>
 -- copyright:
 category:            AI
 build-type:          Simple
-cabal-version:       >=1.8
+cabal-version:       >=1.10
+
+common warnings
+  ghc-options:        -Wall
 
 library
   exposed-modules:     AI.Surely
   other-modules:
-  build-depends:       base == 4.5.*,
-                       monad-par == 0.3.4.6
+  build-depends:       base,
+                       monad-par
   ghc-options:         -O2 -funbox-strict-fields -Wall -threaded
+  default-language:    GHC2021
